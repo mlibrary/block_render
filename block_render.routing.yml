@@ -1,0 +1,6 @@
+block_render.block:
+  path: '/block-render/{block}'
+  defaults:
+    _controller: '\Drupal\block_render\Controller\BlockController::render'
+  requirements:
+    _permission: 'access content'
