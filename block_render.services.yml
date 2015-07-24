@@ -1,0 +1,16 @@
+services:
+  theme.negotiator.block_render.render:
+    class: Drupal\block_render\Theme\RenderNegotiator
+    tags:
+      - { name: theme_negotiator, priority: 0 }
+
+  block_render.block_builder:
+    class: Drupal\block_render\BlockBuilder
+    arguments:
+      - '@asset.resolver'
+      - '@config.factory'
+      - '@library.discovery'
+      - '@library.dependency_resolver'
+      - '@renderer'
+      - '@asset.css.collection_renderer'
+      - '@asset.js.collection_renderer'
