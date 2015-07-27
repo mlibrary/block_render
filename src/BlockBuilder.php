@@ -171,16 +171,33 @@ class BlockBuilder {
     $css = $this->getAssetResolver()->getCssAssets($assets, $performence->get('css.preprocess'));
     $js = $this->getAssetResolver()->getJsAssets($assets, $performence->get('js.preprocess'));
 
+    $header = $this->getCssRenderer()->render($css) + $this->getJsRenderer()->render($js[0]);
+    $header = array_map([$this, 'cleanAssetProperties'], $header);
+
+    $footer = $this->getJsRenderer()->render($js[1]);
+    $footer = array_map([$this, 'cleanAssetProperties'], $footer);
+
     return [
       'dependencies' => $libraries,
-      'styles' => $this->getRenderer()->render($this->getCssRenderer()->render($css)),
-      'scripts' => [
-        'header' => $this->getRenderer()->render($this->getJsRenderer()->render($js[0])),
-        'footer' => $this->getRenderer()->render($this->getJsRenderer()->render($js[1])),
+      'assets' => [
+        'header' => $header,
+        'footer' => $footer,
       ],
       'content' => $content,
     ];
 
+  }
+
+
+  public function cleanAssetProperties($asset) {
+    $new = array();
+    unset($asset['#type']);
+
+    foreach ($asset as $key => $value) {
+      $new[ltrim($key, '#')] = $value;
+    }
+
+    return $new;
   }
 
   /**
