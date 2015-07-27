@@ -53,6 +53,13 @@ class BlockRenderResource extends ResourceBase {
   protected $request;
 
   /**
+   * The formats supported.
+   *
+   * @var array
+   */
+  protected $formats;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -64,13 +71,15 @@ class BlockRenderResource extends ResourceBase {
     EntityManagerInterface $entity_manager,
     BlockBuilder $builder,
     TranslationInterface $translator,
-    RequestStack $request) {
+    RequestStack $request,
+    array $formats) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
 
     $this->entityManager = $entity_manager;
     $this->builder = $builder;
     $this->stringTranslation = $translator;
     $this->request = $request;
+    $this->formats = $formats;
   }
 
   /**
@@ -86,7 +95,8 @@ class BlockRenderResource extends ResourceBase {
       $container->get('entity.manager'),
       $container->get('block_render.block_builder'),
       $container->get('string_translation'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->getParameter('serializer.formats')
     );
   }
 
@@ -151,7 +161,11 @@ class BlockRenderResource extends ResourceBase {
    */
   public function routes() {
     $collection = parent::routes();
-    $collection->get('block_render.GET.json')->setDefault('block_id', NULL);
+
+    foreach ($this->getFormats() as $format) {
+      $collection->get('block_render.GET.' . $format)->setDefault('block_id', NULL);
+    }
+
     return $collection;
   }
 
@@ -183,6 +197,16 @@ class BlockRenderResource extends ResourceBase {
    */
   public function getRequest() {
     return $this->request->getCurrentRequest();
+  }
+
+  /**
+   * Gets the supported formats.
+   *
+   * @return array
+   *   Supported Formats.
+   */
+  public function getFormats() {
+    return $this->formats;
   }
 
 }
