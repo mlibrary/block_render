@@ -4,6 +4,14 @@ services:
     tags:
       - { name: theme_negotiator, priority: 0 }
 
+  block_render.path_processor:
+    class: Drupal\block_render\BlockRenderOutboundPathProcessor
+    tags:
+      - {name: path_processor_outbound}
+    arguments:
+      - '@current_route_match'
+      - '%serializer.formats%'
+
   block_render.block_builder:
     class: Drupal\block_render\BlockBuilder
     arguments:
