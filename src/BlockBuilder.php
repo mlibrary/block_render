@@ -165,7 +165,7 @@ class BlockBuilder {
     }
 
     // Get the performence configuration.
-    $performence = $this->getConfig()->get('system.performence');
+    $performence = $this->getConfig()->get('system.performance');
 
     // Get the CSS & JS Assets.
     $css = $this->getAssetResolver()->getCssAssets($assets, $performence->get('css.preprocess'));
@@ -188,8 +188,16 @@ class BlockBuilder {
 
   }
 
-
-  public function cleanAssetProperties($asset) {
+  /**
+   * Cleans asset properties for easier consumption.
+   *
+   * @param array $asset
+   *   Render array of assets.
+   *
+   * @return array
+   *   An array with type and '#' removed.
+   */
+  public function cleanAssetProperties(array $asset) {
     $new = array();
     unset($asset['#type']);
 

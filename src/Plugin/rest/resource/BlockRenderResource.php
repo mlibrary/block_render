@@ -123,7 +123,10 @@ class BlockRenderResource extends ResourceBase {
         throw new NotFoundHttpException($this->t('Block with ID @id was not found', ['@id' => $block_id]));
       }
 
-      return new ResourceResponse($this->getBuilder()->build($block, $loaded));
+      $response = new ResourceResponse($this->getBuilder()->build($block, $loaded));
+      $response->addCacheableDependency($block);
+
+      return $response;
     }
     else {
 
@@ -142,7 +145,13 @@ class BlockRenderResource extends ResourceBase {
           ];
         }
 
-        return new ResourceResponse($list);
+        $response = new ResourceResponse($list);
+
+        foreach ($blocks as $block) {
+          $response->addCacheableDependency($block);
+        }
+
+        return $response;
       }
 
       // Deliever multiple rendered blocks.
@@ -152,7 +161,13 @@ class BlockRenderResource extends ResourceBase {
         throw new NotFoundHttpException($this->t('No Blocks found'));
       }
 
-      return new ResourceResponse($this->getBuilder()->buildMultiple($blocks, $loaded));
+      $response = new ResourceResponse($this->getBuilder()->buildMultiple($blocks, $loaded));
+
+      foreach ($blocks as $block) {
+        $response->addCacheableDependency($block);
+      }
+
+      return $response;
     }
   }
 
