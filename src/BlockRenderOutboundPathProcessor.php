@@ -6,8 +6,8 @@
 
 namespace Drupal\block_render;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -46,7 +46,7 @@ class BlockRenderOutboundPathProcessor implements OutboundPathProcessorInterface
   /**
    * {@inheritdoc}
    */
-  public function processOutbound($path, &$options = array(), Request $request = NULL, CacheableMetadata $cacheable_metadata = NULL) {
+  public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
     $routes = array();
 
     foreach ($this->getFormats() as $format) {
