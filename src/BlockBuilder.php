@@ -144,8 +144,10 @@ class BlockBuilder {
         unset($build['#attached']);
       }
 
-      // Render the block.
-      $content[$block->id()] = $this->getRenderer()->render($build);
+      // Render the block. Render Plain is used to prevent the cachable metadata
+      // from being added to the response, which throws a fatal error. The build
+      // is typecasted as a string, because an object is returned.
+      $content[$block->id()] = (string) $this->getRenderer()->renderPlain($build);
     }
 
     // Get all of the Assets.
