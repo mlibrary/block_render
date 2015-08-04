@@ -43,8 +43,13 @@ window.Drupal = window.Drupal || {};
 
         // Insert the 'content' from the request.
         for (var block_id in options.blocks) {
-          if (typeof options.blocks[block_id].element == 'object') {
-            var insert = options.blocks[block_id]
+          if (typeof options.blocks[block_id] == 'object') {
+            if (typeof options.blocks[block_id].element == 'object') {
+              var insert = options.blocks[block_id].element
+            }
+            else {
+              var insert = document.getElementById(options.blocks[block_id].element);
+            }
           }
           else {
             var insert = document.getElementById(options.blocks[block_id]);
@@ -98,7 +103,20 @@ window.Drupal = window.Drupal || {};
       // Append all of the requested blocks.
       if (options.blocks) {
         for (var block_id in options.blocks) {
-          url = url + '&blocks[]=' + encodeURIComponent(block_id);
+          if (options.blocks.hasOwnProperty(block_id)){
+            url = url + '&blocks[]=' + encodeURIComponent(block_id);
+
+            // Append the block options.
+            for (var option in options.blocks[block_id]) {
+              if (options.blocks[block_id].hasOwnProperty(option)){
+                if (option == 'element') {
+                  continue;
+                }
+
+                url = url + '&' + block_id +'[' + option + ']=' + encodeURIComponent(options.blocks[block_id][option]);
+              }
+            }
+          }
         }
       }
 
