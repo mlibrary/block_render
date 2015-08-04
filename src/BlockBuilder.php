@@ -131,17 +131,25 @@ class BlockBuilder {
     foreach ($blocks as $block) {
 
       // Build the block content.
-      $build = $block->getPlugin()->build();
+      $build = [
+        '#theme' => 'block',
+        '#configuration' => $block->getPlugin()->getConfiguration(),
+        '#plugin_id' => $block->getPlugin()->getPluginId(),
+        '#base_plugin_id' => $block->getPlugin()->getBaseId(),
+        '#derivative_plugin_id' => $block->getPlugin()->getDerivativeId(),
+        '#id' => $block->id(),
+        'content' => $block->getPlugin()->build()
+      ];
 
       // Get the attached assets.
-      if (isset($build['#attached'])) {
-        foreach ($build['#attached'] as $type => $items) {
+      if (isset($build['content']['#attached'])) {
+        foreach ($build['content']['#attached'] as $type => $items) {
           if (!isset($attached[$type])) {
             $attached[$type] = array();
           }
           $attached[$type] = array_merge($attached[$type], $items);
         }
-        unset($build['#attached']);
+        unset($build['content']['#attached']);
       }
 
       // Render the block. Render Plain is used to prevent the cachable metadata

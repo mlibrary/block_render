@@ -119,6 +119,9 @@ class BlockRenderResource extends ResourceBase {
     if ($block_id) {
       $block = $storage->load($block_id);
 
+      $config = $this->getRequest()->query->all();
+      $block->getPlugin()->setConfiguration($config);
+
       if (!$block) {
         throw new NotFoundHttpException($this->t('Block with ID @id was not found', ['@id' => $block_id]));
       }
@@ -159,6 +162,15 @@ class BlockRenderResource extends ResourceBase {
 
       if (!$blocks) {
         throw new NotFoundHttpException($this->t('No Blocks found'));
+      }
+
+      $config = $this->getRequest()->query->all();
+      foreach ($blocks as $block) {
+        if (!isset($config[$block->id()])) {
+          continue;
+        }
+
+        $block->getPlugin()->setConfiguration($config[$block->id()]);
       }
 
       $response = new ResourceResponse($this->getBuilder()->buildMultiple($blocks, $loaded));
