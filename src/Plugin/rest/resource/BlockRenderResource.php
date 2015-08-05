@@ -9,6 +9,7 @@ namespace Drupal\block_render\Plugin\rest\resource;
 use Drupal\block\BlockInterface;
 use Drupal\block_render\BlockBuilder;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
@@ -16,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -30,6 +32,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * )
  */
 class BlockRenderResource extends ResourceBase {
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
 
   /**
    * The entity manager.
@@ -68,6 +77,7 @@ class BlockRenderResource extends ResourceBase {
     $plugin_definition,
     array $serializer_formats,
     LoggerInterface $logger,
+    AccountInterface $current_user,
     EntityManagerInterface $entity_manager,
     BlockBuilder $builder,
     TranslationInterface $translator,
@@ -76,6 +86,7 @@ class BlockRenderResource extends ResourceBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
 
     $this->entityManager = $entity_manager;
+    $this->currentUser = $current_user;
     $this->builder = $builder;
     $this->stringTranslation = $translator;
     $this->request = $request;
@@ -92,6 +103,7 @@ class BlockRenderResource extends ResourceBase {
       $plugin_definition,
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
+      $container->get('current_user'),
       $container->get('entity.manager'),
       $container->get('block_render.block_builder'),
       $container->get('string_translation'),
@@ -119,12 +131,16 @@ class BlockRenderResource extends ResourceBase {
     if ($block_id) {
       $block = $storage->load($block_id);
 
-      $config = $this->getRequest()->query->all();
-      $block->getPlugin()->setConfiguration($config);
-
       if (!$block) {
         throw new NotFoundHttpException($this->t('Block with ID @id was not found', ['@id' => $block_id]));
       }
+
+      if (!$block->getPlugin()->access($this->getCurrentUser())) {
+        throw new AccessDeniedHttpException($this->t('Access Denied to Block with ID @id', ['@id' => $block_id]));
+      }
+
+      $config = $this->getRequest()->query->all();
+      $block->getPlugin()->setConfiguration($config);
 
       $response = new ResourceResponse($this->getBuilder()->build($block, $loaded));
       $response->addCacheableDependency($block);
@@ -140,7 +156,12 @@ class BlockRenderResource extends ResourceBase {
         $blocks = $storage->loadMultiple();
 
         $list = array();
-        foreach ($blocks as $block) {
+        foreach ($blocks as $key => $block) {
+          if (!$block->getPlugin()->access($this->getCurrentUser())) {
+            unset($blocks[$key]);
+            continue;
+          }
+
           $list[] = [
             'id' => $block->id(),
             'label' => $block->label(),
@@ -165,7 +186,13 @@ class BlockRenderResource extends ResourceBase {
       }
 
       $config = $this->getRequest()->query->all();
-      foreach ($blocks as $block) {
+      foreach ($blocks as $key => $block) {
+
+        if (!$block->getPlugin()->access($this->getCurrentUser())) {
+          unset($blocks[$key]);
+          continue;
+        }
+
         if (!isset($config[$block->id()])) {
           continue;
         }
@@ -194,6 +221,16 @@ class BlockRenderResource extends ResourceBase {
     }
 
     return $collection;
+  }
+
+  /**
+   * Gets the Current User session.
+   *
+   * @return \Drupal\Core\Session\AccountInterface
+   *   Current User session object.
+   */
+  public function getCurrentUser() {
+    return $this->currentUser;
   }
 
   /**
