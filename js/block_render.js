@@ -128,6 +128,7 @@ window.Drupal = window.Drupal || {};
       }
 
       // Send the request.
+      request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       request.open('GET', url);
       request.send();
 
