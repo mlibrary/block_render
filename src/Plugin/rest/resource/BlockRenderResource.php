@@ -62,11 +62,11 @@ class BlockRenderResource extends ResourceBase {
   protected $request;
 
   /**
-   * The formats supported.
+   * The available serialization formats.
    *
    * @var array
    */
-  protected $formats;
+  protected $serializerFormats = array();
 
   /**
    * {@inheritdoc}
@@ -81,8 +81,7 @@ class BlockRenderResource extends ResourceBase {
     EntityManagerInterface $entity_manager,
     BlockBuilder $builder,
     TranslationInterface $translator,
-    RequestStack $request,
-    array $formats) {
+    RequestStack $request) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
 
     $this->entityManager = $entity_manager;
@@ -90,7 +89,6 @@ class BlockRenderResource extends ResourceBase {
     $this->builder = $builder;
     $this->stringTranslation = $translator;
     $this->request = $request;
-    $this->formats = $formats;
   }
 
   /**
@@ -107,8 +105,7 @@ class BlockRenderResource extends ResourceBase {
       $container->get('entity.manager'),
       $container->get('block_render.block_builder'),
       $container->get('string_translation'),
-      $container->get('request_stack'),
-      $container->getParameter('serializer.formats')
+      $container->get('request_stack')
     );
   }
 
@@ -270,7 +267,7 @@ class BlockRenderResource extends ResourceBase {
    *   Supported Formats.
    */
   public function getFormats() {
-    return $this->formats;
+    return $this->serializerFormats;
   }
 
 }

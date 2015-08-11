@@ -17,6 +17,7 @@ services:
     arguments:
       - '@asset.resolver'
       - '@config.factory'
+      - '@entity.manager'
       - '@library.discovery'
       - '@library.dependency_resolver'
       - '@renderer'

@@ -12,7 +12,9 @@ use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\block\BlockInterface;
 
@@ -34,6 +36,13 @@ class BlockBuilder {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $config;
+
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
 
   /**
    * Library Discovery.
@@ -81,6 +90,7 @@ class BlockBuilder {
   public function __construct(
     AssetResolverInterface $asset_resolver,
     ConfigFactoryInterface $config,
+    EntityManagerInterface $entity_manager,
     LibraryDiscoveryInterface $library_discovery,
     LibraryDependencyResolverInterface $library_dependency_resolver,
     RendererInterface $renderer,
@@ -89,6 +99,7 @@ class BlockBuilder {
 
     $this->assetResolver = $asset_resolver;
     $this->config = $config;
+    $this->entityManager = $entity_manager;
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->renderer = $renderer;
@@ -127,6 +138,7 @@ class BlockBuilder {
   public function buildMultiple(array $blocks, array $loaded = array()) {
     $attached = array();
     $content = array();
+    $count = count($blocks);
 
     foreach ($blocks as $block) {
 
@@ -138,8 +150,31 @@ class BlockBuilder {
         '#base_plugin_id' => $block->getPlugin()->getBaseId(),
         '#derivative_plugin_id' => $block->getPlugin()->getDerivativeId(),
         '#id' => $block->id(),
-        'content' => $block->getPlugin()->build()
+        '#attributes' => [],
+        'content' => $block->getPlugin()->build(),
       ];
+
+      $build = $this->getEntityManager()->getViewBuilder('block')->view($block);
+
+      // The query arguments should be added to the cache contexts.
+      $contexts = isset($build['#cache']['contexts']) ? $build['#cache']['contexts'] : array();
+      if ($count > 1) {
+        $build['#cache']['contexts'] = Cache::mergeContexts(['url.query_args:' . $block->id()], $contexts);
+      }
+      else {
+        $build['#cache']['contexts'] = Cache::mergeContexts(['url.query_args'], $contexts);
+      }
+
+      // Execute the pre_render hooks so the block will be built.
+      if (isset($build['#pre_render'])) {
+        foreach ($build['#pre_render'] as $key => $callable) {
+          if (is_string($callable) && strpos($callable, '::') === FALSE) {
+            $callable = $this->controllerResolver->getControllerFromDefinition($callable);
+          }
+          $build = call_user_func($callable, $build);
+          unset($build['#pre_render'][$key]);
+        }
+      }
 
       // Get the attached assets.
       if (isset($build['content']['#attached'])) {
@@ -152,10 +187,10 @@ class BlockBuilder {
         unset($build['content']['#attached']);
       }
 
-      // Render the block. Render Plain is used to prevent the cachable metadata
+      // Render the block. Render root is used to prevent the cachable metadata
       // from being added to the response, which throws a fatal error. The build
       // is typecasted as a string, because an object is returned.
-      $content[$block->id()] = (string) $this->getRenderer()->renderPlain($build);
+      $content[$block->id()] = (string) $this->getRenderer()->renderRoot($build);
     }
 
     // Get all of the Assets.
@@ -262,6 +297,17 @@ class BlockBuilder {
   public function getConfig() {
     return $this->config;
   }
+
+  /**
+   * Gets the Entity Manager object.
+   *
+   * @return \Drupal\Core\Entity\EntityManagerInterface
+   *   Entity Manager object.
+   */
+  public function getEntityManager() {
+    return $this->entityManager;
+  }
+
 
   /**
    * Gets the Library Discovery.

@@ -7,6 +7,7 @@
 namespace Drupal\block_render\Controller;
 
 use Drupal\block\BlockInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -85,10 +86,18 @@ class BlockController implements ContainerInjectionInterface {
       throw new AccessDeniedHttpException($this->t('Access Denied to Block with ID @id', ['@id' => $block->id()]));
     }
 
+    // Add the configuration to the block.
     $config = $this->getRequest()->query->all();
     $block->getPlugin()->setConfiguration($config);
 
-    return $this->getEntityManager()->getViewBuilder('block')->view($block);
+    // Build the block.
+    $build = $this->getEntityManager()->getViewBuilder('block')->view($block);
+
+    // Add the query arguments to the cache contexts.
+    $contexts = isset($build['#cache']['contexts']) ? $build['#cache']['contexts'] : array();
+    $build['#cache']['contexts'] = Cache::mergeContexts(['url.query_args'], $contexts);
+
+    return $build;
   }
 
   /**
