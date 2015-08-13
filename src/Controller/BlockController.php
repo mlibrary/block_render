@@ -8,11 +8,7 @@ namespace Drupal\block_render\Controller;
 
 use Drupal\block\BlockInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,23 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Block Controllers.
  */
-class BlockController implements ContainerInjectionInterface {
-
-  use StringTranslationTrait;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The entity manager.
-   *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entityManager;
+class BlockController extends ControllerBase {
 
   /**
    * The request.
@@ -48,15 +28,7 @@ class BlockController implements ContainerInjectionInterface {
   /**
    * Constructor to add the dependencies.
    */
-  public function __construct(
-    AccountInterface $current_user,
-    EntityManagerInterface $entity_manager,
-    TranslationInterface $translator,
-    RequestStack $request) {
-
-    $this->currentUser = $current_user;
-    $this->entityManager = $entity_manager;
-    $this->stringTranslation = $translator;
+  public function __construct(RequestStack $request) {
     $this->request = $request;
   }
 
@@ -64,12 +36,7 @@ class BlockController implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('current_user'),
-      $container->get('entity.manager'),
-      $container->get('string_translation'),
-      $container->get('request_stack')
-    );
+    return new static($container->get('request_stack'));
   }
 
   /**
@@ -82,7 +49,7 @@ class BlockController implements ContainerInjectionInterface {
    *   Build array of the requested block.
    */
   public function render(BlockInterface $block) {
-    if (!$block->getPlugin()->access($this->getCurrentUser())) {
+    if (!$block->getPlugin()->access($this->currentUser())) {
       throw new AccessDeniedHttpException($this->t('Access Denied to Block with ID @id', ['@id' => $block->id()]));
     }
 
@@ -91,7 +58,7 @@ class BlockController implements ContainerInjectionInterface {
     $block->getPlugin()->setConfiguration($config);
 
     // Build the block.
-    $build = $this->getEntityManager()->getViewBuilder('block')->view($block);
+    $build = $this->entityManager()->getViewBuilder('block')->view($block);
 
     // Add the query arguments to the cache contexts.
     $contexts = isset($build['#cache']['contexts']) ? $build['#cache']['contexts'] : array();
@@ -111,26 +78,6 @@ class BlockController implements ContainerInjectionInterface {
    */
   public function renderTitle(BlockInterface $block) {
     return $block->label();
-  }
-
-  /**
-   * Gets the Current User session.
-   *
-   * @return \Drupal\Core\Session\AccountInterface
-   *   Current User session object.
-   */
-  public function getCurrentUser() {
-    return $this->currentUser;
-  }
-
-  /**
-   * Gets the Entity Manager object.
-   *
-   * @return \Drupal\Core\Entity\EntityManagerInterface
-   *   Entity Manager object.
-   */
-  public function getEntityManager() {
-    return $this->entityManager;
   }
 
   /**
