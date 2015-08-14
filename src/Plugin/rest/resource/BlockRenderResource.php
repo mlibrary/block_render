@@ -62,9 +62,7 @@ class BlockRenderResource extends ResourceBase {
   protected $request;
 
   /**
-   * The available serialization formats.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected $serializerFormats = array();
 
@@ -121,7 +119,6 @@ class BlockRenderResource extends ResourceBase {
    *   The response containing the rendered block.
    */
   public function get($block_id = NULL) {
-    $loaded = $this->getRequest()->get('loaded', array());
     $storage = $this->getEntityManager()->getStorage('block');
 
     // Deliver a single block.
@@ -132,47 +129,14 @@ class BlockRenderResource extends ResourceBase {
         throw new NotFoundHttpException($this->t('Block with ID @id was not found', ['@id' => $block_id]));
       }
 
-      if (!$block->getPlugin()->access($this->getCurrentUser())) {
-        throw new AccessDeniedHttpException($this->t('Access Denied to Block with ID @id', ['@id' => $block_id]));
-      }
-
-      $config = $this->getRequest()->query->all();
-      $block->getPlugin()->setConfiguration($config);
-
-      $response = new ResourceResponse($this->getBuilder()->build($block, $loaded));
-      $response->addCacheableDependency($block);
-
-      return $response;
+      return $this->getBlock($block);
     }
     else {
-
       $block_ids = $this->getRequest()->get('blocks');
 
       // Deliver a list of blocks ids.
       if (!$block_ids) {
-        $blocks = $storage->loadMultiple();
-
-        $list = array();
-        foreach ($blocks as $key => $block) {
-          if (!$block->getPlugin()->access($this->getCurrentUser())) {
-            unset($blocks[$key]);
-            continue;
-          }
-
-          $list[] = [
-            'id' => $block->id(),
-            'label' => $block->label(),
-            'theme' => $block->getTheme(),
-          ];
-        }
-
-        $response = new ResourceResponse($list);
-
-        foreach ($blocks as $block) {
-          $response->addCacheableDependency($block);
-        }
-
-        return $response;
+        return $this->getBlockList();
       }
 
       // Deliever multiple rendered blocks.
@@ -182,29 +146,106 @@ class BlockRenderResource extends ResourceBase {
         throw new NotFoundHttpException($this->t('No Blocks found'));
       }
 
-      $config = $this->getRequest()->query->all();
-      foreach ($blocks as $key => $block) {
-
-        if (!$block->getPlugin()->access($this->getCurrentUser())) {
-          unset($blocks[$key]);
-          continue;
-        }
-
-        if (!isset($config[$block->id()])) {
-          continue;
-        }
-
-        $block->getPlugin()->setConfiguration($config[$block->id()]);
-      }
-
-      $response = new ResourceResponse($this->getBuilder()->buildMultiple($blocks, $loaded));
-
-      foreach ($blocks as $block) {
-        $response->addCacheableDependency($block);
-      }
-
-      return $response;
+      return $this->getBlocks($blocks);
     }
+  }
+
+  /**
+   * Single Block Response.
+   *
+   * Returns a rendered block entry for the specified block.
+   *
+   * @param \Drupal\block\BlockInterface $block
+   *   Reference to the block to render.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing the rendered block.
+   */
+  public function getBlock(BlockInterface $block) {
+    $loaded = $this->getRequest()->get('loaded', array());
+
+    if (!$block->getPlugin()->access($this->getCurrentUser())) {
+      throw new AccessDeniedHttpException($this->t('Access Denied to Block with ID @id', ['@id' => $block->id()]));
+    }
+
+    $config = $this->getRequest()->query->all();
+    $block->getPlugin()->setConfiguration($config);
+
+    $response = new ResourceResponse($this->getBuilder()->build($block, $loaded));
+    $response->addCacheableDependency($block);
+
+    return $response;
+  }
+
+  /**
+   * Multiple Block Response.
+   *
+   * Returns a list of rendered block entry for the specified block.
+   *
+   * @param array $blocks
+   *   Reference to the blocks to render.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing the rendered block.
+   */
+  public function getBlocks(array $blocks) {
+    $loaded = $this->getRequest()->get('loaded', array());
+    $config = $this->getRequest()->query->all();
+
+    foreach ($blocks as $key => $block) {
+      if (!$block->getPlugin()->access($this->getCurrentUser())) {
+        unset($blocks[$key]);
+        continue;
+      }
+
+      if (!isset($config[$block->id()])) {
+        continue;
+      }
+
+      $block->getPlugin()->setConfiguration($config[$block->id()]);
+    }
+
+    $response = new ResourceResponse($this->getBuilder()->buildMultiple($blocks, $loaded));
+
+    foreach ($blocks as $block) {
+      $response->addCacheableDependency($block);
+    }
+
+    return $response;
+  }
+
+  /**
+   * List Block Response.
+   *
+   * Returns a list blocks that can be rendered.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing the rendered block.
+   */
+  public function getBlockList() {
+    $blocks = $this->getEntityManager()->getStorage('block')->loadMultiple();
+
+    $list = array();
+    foreach ($blocks as $key => $block) {
+      if (!$block->getPlugin()->access($this->getCurrentUser())) {
+        unset($blocks[$key]);
+        continue;
+      }
+
+      $list[] = [
+        'id' => $block->id(),
+        'label' => $block->label(),
+        'theme' => $block->getTheme(),
+      ];
+    }
+
+    $response = new ResourceResponse($list);
+
+    foreach ($blocks as $block) {
+      $response->addCacheableDependency($block);
+    }
+
+    return $response;
   }
 
   /**
