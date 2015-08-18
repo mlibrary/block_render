@@ -6,10 +6,12 @@
 
 namespace Drupal\block_render\Library;
 
+use Drupal\block_render\Immutable;
+
 /**
  * Single Library.
  */
-class Library implements LibraryInterface {
+final class Library extends Immutable implements LibraryInterface {
 
   /**
    * Name of the library.
@@ -39,40 +41,10 @@ class Library implements LibraryInterface {
   }
 
   /**
-   * Sets the Name.
-   *
-   * @param string $name
-   *   Name of the library.
-   *
-   * @return \Drupal\block_render\Library\Libarary
-   *   Current library object.
-   */
-  public function setName($name) {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getName() {
     return $this->name;
-  }
-
-  /**
-   * Sets the Name.
-   *
-   * @param string $version
-   *   Name of the version.
-   *
-   * @return \Drupal\block_render\Library\Libarary
-   *   Current library object.
-   */
-  public function setVersion($version) {
-    $this->version = $version;
-
-    return $this;
   }
 
   /**
