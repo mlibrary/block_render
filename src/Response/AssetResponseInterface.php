@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains Drupal\block_render\Data\AssetResponseInterface.
+ * Contains Drupal\block_render\Response\AssetResponseInterface.
  */
 
-namespace Drupal\block_render\Data;
+namespace Drupal\block_render\Response;
 
 /**
  * The asset response data.
@@ -14,7 +14,7 @@ interface AssetResponseInterface {
   /**
    * Returns the asset libraries.
    *
-   * @return \Drupal\block_render\Data\LibraryResponseInterface
+   * @return \Drupal\block_render\Libraries\Libraries
    *   A library response object.
    */
   public function getLibraries();

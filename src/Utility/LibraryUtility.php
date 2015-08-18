@@ -6,7 +6,8 @@
 
 namespace Drupal\block_render\Utility;
 
-use Drupal\block_render\Data\LibraryResponse;
+use Drupal\block_render\Library\Library;
+use Drupal\block_render\Libraries\Libraries;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
@@ -46,14 +47,15 @@ class LibraryUtility implements LibraryUtilityInterface {
    */
   public function getLibraryResponse(AttachedAssetsInterface $assets) {
     $library_names = $this->getLibrariesToLoad($assets);
-    $libraries = array();
+    $libraries = new Libraries();
     foreach ($library_names as $library_name) {
       list($extension, $name) = explode('/', $library_name);
       $data = $this->getLibraryDiscovery()->getLibraryByName($extension, $name);
-      $libraries[$library_name] = isset($data['version']) ? $data['version'] : '';
+      $version = isset($data['version']) ? $data['version'] : '';
+      $libraries->addLibrary(new Library($name, $version));
     }
 
-    return new LibraryResponse($libraries);
+    return $libraries;
   }
 
   /**

@@ -6,7 +6,7 @@
 
 namespace Drupal\block_render\Utility;
 
-use Drupal\block_render\Data\AssetResponse;
+use Drupal\block_render\Response\AssetResponse;
 use Drupal\block_render\Utility\LibraryUtilityInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\AssetResolverInterface;

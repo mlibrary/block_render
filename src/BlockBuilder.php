@@ -6,17 +6,19 @@
 
 namespace Drupal\block_render;
 
+use Drupal\block\BlockInterface;
+use Drupal\block_render\Content\RenderedContent;
+use Drupal\block_render\Utility\AssetUtilityInterface;
+use Drupal\block_render\Response\BlockResponse;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\block\BlockInterface;
-use Drupal\block_render\Utility\AssetUtilityInterface;
 
 /**
  * Build a block from a given id.
  */
-class BlockBuilder {
+class BlockBuilder implements BlockBuilderInterface {
 
   /**
    * The asset utility.
@@ -56,37 +58,20 @@ class BlockBuilder {
   }
 
   /**
-   * Builds multiple blocks.
-   *
-   * @param \Drupal\block\BlockInterface $block
-   *   Block to render.
-   * @param array $loaded
-   *   Libraries that have already been loaded.
-   *
-   * @return array
-   *   An array of content and assets to be rendered.
+   * {@inheritdoc}
    */
   public function build(BlockInterface $block, array $loaded = array()) {
-    $response = $this->buildMultiple([$block], $loaded);
-    $response['content'] = reset($response['content']);
-    return $response;
+    return $this->buildMultiple([$block], $loaded, TRUE);
   }
 
   /**
-   * Builds multiple blocks.
-   *
-   * @param array $blocks
-   *   Array of Blocks to render.
-   * @param array $loaded
-   *   Libraries that have already been loaded.
-   *
-   * @return array
-   *   An array of content and assets to be rendered.
+   * {@inheritdoc}
    */
-  public function buildMultiple(array $blocks, array $loaded = array()) {
+  public function buildMultiple(array $blocks, array $loaded = array(), $single = FALSE) {
     $attached = array();
     $content = array();
     $count = count($blocks);
+    $content = new RenderedContent(array(), $single);
 
     foreach ($blocks as $block) {
 
@@ -112,7 +97,7 @@ class BlockBuilder {
       // Render the block. Render root is used to prevent the cachable metadata
       // from being added to the response, which throws a fatal error. The build
       // is typecasted as a string, because an object is returned.
-      $content[$block->id()] = (string) $this->getRenderer()->renderRoot($build);
+      $content->addContent($block->id(), $this->getRenderer()->renderRoot($build));
     }
 
     // Get all of the Assets.
@@ -125,15 +110,7 @@ class BlockBuilder {
     // Get the asset response.
     $asset_response = $this->getAssetUtility()->getAssetResponse($assets);
 
-    return [
-      'dependencies' => $asset_response->getLibraries()->getLibraries(),
-      'assets' => [
-        'header' => $asset_response->getHeader(),
-        'footer' => $asset_response->getFooter(),
-      ],
-      'content' => $content,
-    ];
-
+    return new BlockResponse($asset_response, $content);
   }
 
   /**
@@ -142,7 +119,7 @@ class BlockBuilder {
    * @param array $build
    *   Build array with pre-render callbacks.
    */
-  public function executePreRender(array &$build) {
+  private function executePreRender(array &$build) {
     if (isset($build['#pre_render'])) {
       foreach ($build['#pre_render'] as $key => $callable) {
         if (is_string($callable) && strpos($callable, '::') === FALSE) {

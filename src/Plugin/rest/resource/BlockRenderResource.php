@@ -7,7 +7,7 @@
 namespace Drupal\block_render\Plugin\rest\resource;
 
 use Drupal\block\BlockInterface;
-use Drupal\block_render\BlockBuilder;
+use Drupal\block_render\BlockBuilderInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -50,7 +50,7 @@ class BlockRenderResource extends ResourceBase {
   /**
    * The block builder.
    *
-   * @var \Drupal\block_render\BlockBuilder
+   * @var \Drupal\block_render\BlockBuilderInterface
    */
   protected $builder;
 
@@ -77,7 +77,7 @@ class BlockRenderResource extends ResourceBase {
     LoggerInterface $logger,
     AccountInterface $current_user,
     EntityManagerInterface $entity_manager,
-    BlockBuilder $builder,
+    BlockBuilderInterface $builder,
     TranslationInterface $translator,
     RequestStack $request) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
@@ -284,7 +284,7 @@ class BlockRenderResource extends ResourceBase {
   /**
    * Gets the Builder service.
    *
-   * @return \Drupal\block_render\BlockBuilder
+   * @return \Drupal\block_render\BlockBuilderInterface
    *   Renderer object.
    */
   public function getBuilder() {
