@@ -7,7 +7,6 @@
 namespace Drupal\block_render\Normalizer;
 
 use Drupal\serialization\Normalizer\NormalizerBase;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Class to Normalize the Libraries.
