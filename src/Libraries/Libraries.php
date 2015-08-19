@@ -7,7 +7,7 @@
 namespace Drupal\block_render\Libraries;
 
 use Drupal\block_render\Immutable;
-use Drupal\block_render\Library\Library;
+use Drupal\block_render\Library\LibraryInterface;
 
 /**
  * A set of libraries.
@@ -28,6 +28,7 @@ final class Libraries extends Immutable implements LibrariesInterface {
    *   An array of Drupal\block_render\Library\Library.
    */
   public function __construct(array $libraries = array()) {
+    $this->libraries = array();
     foreach ($libraries as $library) {
       $this->addLibrary($library);
     }
@@ -36,13 +37,13 @@ final class Libraries extends Immutable implements LibrariesInterface {
   /**
    * Adds a library.
    *
-   * @param \Drupal\block_render\Library\Library $library
+   * @param \Drupal\block_render\Library\LibraryInterface $library
    *   Signle Library.
    *
    * @return \Drupal\block_render\Libraries\Libraries
    *   Return the asset response object.
    */
-  public function addLibrary(Library $library) {
+  public function addLibrary(LibraryInterface $library) {
     $this->libraries[] = $library;
 
     return $this;

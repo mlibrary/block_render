@@ -59,7 +59,10 @@ class RenderedContentTest extends UnitTestCase {
     $rendered->addContent('test', $content);
     $rendered->addContent('test2', $content);
 
+    $this->assertInternalType('array', $rendered->getContent());
+    $this->assertArrayHasKey('test', $rendered->getContent());
     $this->assertEquals($content, $rendered->getContent()['test']);
+    $this->assertArrayHasKey('test2', $rendered->getContent());
     $this->assertEquals($content, $rendered->getContent()['test2']);
   }
 
