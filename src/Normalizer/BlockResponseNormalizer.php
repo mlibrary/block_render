@@ -6,6 +6,7 @@
 
 namespace Drupal\block_render\Normalizer;
 
+use Drupal\block_render\Response\BlockResponseInterface;
 use Drupal\serialization\Normalizer\NormalizerBase;
 
 /**
@@ -22,6 +23,10 @@ class BlockResponseNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($object, $format = NULL, array $context = array()) {
+    if (!($object instanceof BlockResponseInterface)) {
+      throw new \InvalidArgumentException('Object must implement Drupal\block_render\Response\BlockResponseInterface');
+    }
+
     return [
       'dependencies' => $this->serializer->normalize($object->getAssets()->getLibraries(), $format, $context),
       'assets' => [

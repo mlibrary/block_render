@@ -59,4 +59,18 @@ class BlockResponseNormalizerTest extends UnitTestCase {
     $this->assertEquals('normalized object', $data['content']);
   }
 
+  /**
+   * Tests the normalization failure.
+   */
+  public function testNormalizeFailure() {
+    $this->setExpectedException('\InvalidArgumentException', 'Object must implement Drupal\block_render\Response\BlockResponseInterface');
+
+    $normalizer = new BlockResponseNormalizer();
+
+    $rendered = $this->getMockBuilder('\Throwable')
+      ->getMock();
+
+    $normalizer->normalize($rendered);
+  }
+
 }
