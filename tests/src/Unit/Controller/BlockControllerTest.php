@@ -97,4 +97,48 @@ class BlockControllerTest extends UnitTestCase {
     $controller->render($block);
   }
 
+  /**
+   * Tests rending the title.
+   */
+  public function testRenderTitle() {
+    $controller = $this->createBlockController();
+
+    $block = $this->getBlockMockWithMachineName($this->randomMachineName());
+    $block->expects($this->once())
+      ->method('label')
+      ->will($this->returnValue('Block Label'));
+
+    $label = $controller->renderTitle($block);
+
+    $this->assertInternalType('string', $label);
+    $this->assertEquals('Block Label', $label);
+  }
+
+  /**
+   * Tests getting the Request.
+   */
+  public function testGetRequest() {
+    $controller = $this->createBlockController();
+
+    $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Request', $controller->getRequest());
+  }
+
+  /**
+   * Create BlockController stub.
+   *
+   * @return \Drupal\block_render\Controller\BlockController
+   *   New BlockController instance.
+   */
+  public function createBlockController() {
+    $stack = new RequestStack();
+    $stack->push(new Request());
+    $entity_manager = $this->getMockBuilder('Drupal\Core\Entity\EntityManagerInterface')
+      ->getMock();
+    $current_user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')
+      ->getMock();
+    $string_translation = $this->getMockBuilder('Drupal\Core\StringTranslation\TranslationInterface')
+      ->getMock();
+    return new BlockController($entity_manager, $stack, $current_user, $string_translation);
+  }
+
 }

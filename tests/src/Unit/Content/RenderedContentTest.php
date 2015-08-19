@@ -20,25 +20,12 @@ class RenderedContentTest extends UnitTestCase {
    * Tests the construct.
    */
   public function testRenderedContent() {
-
     $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
       ->getMock();
 
-    $rendered = new RenderedContent(['test' => $content], FALSE);
-
-    $this->assertEquals($content, $rendered->getContent()['test']);
-    $this->assertFalse($rendered->isSingle());
-
-    $rendered = new RenderedContent(['test' => $content], TRUE);
-
-    $this->assertEquals($content, $rendered->getContent()['test']);
-    $this->assertTrue($rendered->isSingle());
-
-    $rendered = new RenderedContent(['test' => $content, 'test2' => $content], TRUE);
-
-    $this->assertEquals($content, $rendered->getContent()['test']);
-    $this->assertEquals($content, $rendered->getContent()['test2']);
-    $this->assertFalse($rendered->isSingle());
+    new RenderedContent(['test' => $content], FALSE);
+    new RenderedContent(['test' => $content], TRUE);
+    new RenderedContent(['test' => $content, 'test2' => $content], TRUE);
   }
 
   /**
@@ -53,7 +40,7 @@ class RenderedContentTest extends UnitTestCase {
   /**
    * Tests setting a property on the class.
    */
-  public function testSet() {
+  public function testSetFailure() {
     $this->setExpectedException('\LogicException', 'You cannot set properties.');
 
     $content = new RenderedContent();
@@ -84,6 +71,59 @@ class RenderedContentTest extends UnitTestCase {
 
     $rendered = new RenderedContent();
     $rendered->addContent('test', 'string');
+  }
+
+  /**
+   * Tests getting the content.
+   */
+  public function testGetContent() {
+    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+      ->getMock();
+
+    $rendered = new RenderedContent(['test' => $content], FALSE);
+
+    $this->assertInternalType('array', $rendered->getContent());
+    $this->assertArrayHasKey('test', $rendered->getContent());
+    $this->assertEquals($content, $rendered->getContent()['test']);
+
+    $rendered = new RenderedContent(['test' => $content], TRUE);
+
+    $this->assertInternalType('array', $rendered->getContent());
+    $this->assertArrayHasKey('test', $rendered->getContent());
+    $this->assertEquals($content, $rendered->getContent()['test']);
+
+    $rendered = new RenderedContent(['test' => $content, 'test2' => $content], TRUE);
+
+    $this->assertInternalType('array', $rendered->getContent());
+    $this->assertArrayHasKey('test', $rendered->getContent());
+    $this->assertEquals($content, $rendered->getContent()['test']);
+    $this->assertArrayHasKey('test2', $rendered->getContent());
+    $this->assertEquals($content, $rendered->getContent()['test2']);
+  }
+
+  /**
+   * Tests if the item is single.
+   */
+  public function testIsSingle() {
+    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+      ->getMock();
+
+    $rendered = new RenderedContent(['test' => $content], FALSE);
+    $this->assertFalse($rendered->isSingle());
+
+    $rendered = new RenderedContent(['test' => $content], TRUE);
+    $this->assertTrue($rendered->isSingle());
+
+    $rendered = new RenderedContent(['test' => $content, 'test2' => $content], TRUE);
+    $this->assertFalse($rendered->isSingle());
+  }
+
+  /**
+   * Tests getting the iterator.
+   */
+  public function testGetIterator() {
+    $rendered = new RenderedContent();
+    $this->assertInstanceOf('\ArrayIterator', $rendered->getIterator());
   }
 
 }

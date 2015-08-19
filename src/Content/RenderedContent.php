@@ -33,14 +33,16 @@ final class RenderedContent extends Immutable implements RenderedContentInterfac
    *
    * @param array $content
    *   Array of Drupal\Component\Utility\SafeStringInterface objects.
-   * @param int $single
+   * @param bool $single
    *   Indicator if a single item should be returned.
    */
   public function __construct(array $content = array(), $single = FALSE) {
+    $this->content = array();
+    $this->single = $single;
+
     foreach ($content as $id => $item) {
       $this->addContent($id, $item);
     }
-    $this->single = $single;
   }
 
   /**
