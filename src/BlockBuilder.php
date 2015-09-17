@@ -78,6 +78,11 @@ class BlockBuilder implements BlockBuilderInterface {
       // Build the block content.
       $build = $this->getEntityManager()->getViewBuilder('block')->view($block);
 
+      // If a lazy_builder is returned, execute that first.
+      if (isset($build['#lazy_builder'])) {
+        $build = call_user_func_array($build['#lazy_builder'][0], $build['#lazy_builder'][1]);
+      }
+
       // The query arguments should be added to the cache contexts.
       $contexts = isset($build['#cache']['contexts']) ? $build['#cache']['contexts'] : array();
       if ($count > 1) {
@@ -101,7 +106,12 @@ class BlockBuilder implements BlockBuilderInterface {
     }
 
     // Get all of the Assets.
-    $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
+    if ($attached) {
+      $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
+    }
+    else {
+      $assets = new AttachedAssets();
+    }
 
     if ($loaded) {
       $assets->setAlreadyLoadedLibraries($loaded);
