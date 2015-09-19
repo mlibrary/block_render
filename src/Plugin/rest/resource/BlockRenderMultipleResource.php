@@ -8,6 +8,7 @@ namespace Drupal\block_render\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * REST endpoint for multiple rendered Blocks.
@@ -56,6 +57,10 @@ class BlockRenderMultipleResource extends BlockRenderResourceBase {
    */
   public function getMultiple(array $block_ids) {
     $storage = $this->getEntityManager()->getStorage('block');
+
+    if (!$block_ids) {
+      throw new BadRequestHttpException($this->t('No Block IDs specified'));
+    }
 
     // Deliever multiple rendered blocks.
     $blocks = $storage->loadMultiple($block_ids);
