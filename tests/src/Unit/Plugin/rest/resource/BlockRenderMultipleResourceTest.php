@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class BlockRenderMultipleResourceTest extends BlockRenderResourceBase {
 
-
   /**
    * Test Response to GET requests.
    */
@@ -80,10 +79,15 @@ class BlockRenderMultipleResourceTest extends BlockRenderResourceBase {
     $translator = $this->getStringTranslationStub();
     $builder = $this->getBuilder();
 
+    $block_id = $this->randomMachineName();
+    $block = $this->getMockBuilder('Drupal\block\BlockInterface')
+      ->getMock();
+
     $storage = $this->getStorage();
     $storage->expects($this->once())
       ->method('loadMultiple')
-      ->will($this->returnValue(array()));
+      ->with([$block_id])
+      ->will($this->returnValue([$block_id => $block]));
 
     $entity_manager = $this->getEntityManager();
     $entity_manager->expects($this->once())
@@ -107,7 +111,7 @@ class BlockRenderMultipleResourceTest extends BlockRenderResourceBase {
       $stack
     );
 
-    $response = $resource->getMultiple(array());
+    $response = $resource->getMultiple([$block_id]);
     $content = $response->getResponseData();
 
     $this->assertInternalType('array', $content);
