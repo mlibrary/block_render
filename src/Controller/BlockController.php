@@ -97,6 +97,11 @@ class BlockController extends ControllerBase {
     // Build the block.
     $build = $this->entityManager()->getViewBuilder('block')->view($block);
 
+    // If a lazy_builder is returned, execute that first.
+    if (isset($build['#lazy_builder'])) {
+      $build = call_user_func_array($build['#lazy_builder'][0], $build['#lazy_builder'][1]);
+    }
+
     // Add the query arguments to the cache contexts.
     if (isset($build['#cache']['contexts'])) {
       $contexts = $build['#cache']['contexts'];
