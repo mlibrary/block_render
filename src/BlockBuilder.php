@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\block_render\BlockBuiler.
+ * Contains Drupal\block_render\BlockBuilder.
  */
 
 namespace Drupal\block_render;

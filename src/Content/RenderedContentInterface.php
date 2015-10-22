@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\block_render\Content\RenderedContent.
+ * Contains Drupal\block_render\Content\RenderedContentInterface.
  */
 
 namespace Drupal\block_render\Content;
