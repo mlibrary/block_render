@@ -47,10 +47,13 @@ class BlockRenderOutboundPathProcessor implements OutboundPathProcessorInterface
    * {@inheritdoc}
    */
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
-    $routes = array();
+    $routes = [
+      'block_render.block',
+    ];
 
     foreach ($this->getFormats() as $format) {
-      $routes[] = 'block_render.GET.' . $format;
+      $routes[] = 'rest.block_render.GET.' . $format;
+      $routes[] = 'rest.block_render_multiple.GET.' . $format;
     }
 
     if (in_array($this->getRoute()->getRouteName(), $routes)) {
