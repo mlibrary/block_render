@@ -22,7 +22,7 @@ class RenderedContentNormalizerTest extends UnitTestCase {
   public function testNormalize() {
     $normalizer = new RenderedContentNormalizer();
 
-    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
       ->getMock();
 
     $content->expects($this->exactly(2))

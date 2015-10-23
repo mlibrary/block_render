@@ -7,7 +7,7 @@
 namespace Drupal\block_render\Content;
 
 use Drupal\block_render\Immutable;
-use Drupal\Component\Utility\SafeStringInterface;
+use Drupal\Component\Render\MarkupInterface;
 
 /**
  * Contains the rendered content.
@@ -32,7 +32,7 @@ final class RenderedContent extends Immutable implements RenderedContentInterfac
    * Sets the initial content.
    *
    * @param array $content
-   *   Array of Drupal\Component\Utility\SafeStringInterface objects.
+   *   Array of Drupal\Component\Render\MarkupInterface objects.
    * @param bool $single
    *   Indicator if a single item should be returned.
    */
@@ -50,14 +50,14 @@ final class RenderedContent extends Immutable implements RenderedContentInterfac
    *
    * @param string $id
    *   Identifier of the content.
-   * @param \Drupal\Component\Utility\SafeStringInterface $safe_string
+   * @param \Drupal\Component\Render\MarkupInterface $markup
    *   A safe string of the rendered content.
    *
    * @return \Drupal\block_render\Cotnent\RenderedContent
    *   Rendered Content object.
    */
-  public function addContent($id, SafeStringInterface $safe_string) {
-    $this->content[$id] = $safe_string;
+  public function addContent($id, MarkupInterface $markup) {
+    $this->content[$id] = $markup;
 
     return $this;
   }

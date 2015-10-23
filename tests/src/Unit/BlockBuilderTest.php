@@ -57,11 +57,11 @@ class BlockBuilderTest extends UnitTestCase {
       ->with('block')
       ->will($this->returnValue($entity_builder));
 
-    $string = $this->getMock('Drupal\Component\Utility\SafeStringInterface');
+    $markup = $this->getMock('Drupal\Component\Render\MarkupInterface');
     $renderer = $this->getMock('Drupal\Core\Render\RendererInterface');
     $renderer->expects($this->once())
       ->method('renderRoot')
-      ->will($this->returnValue($string));
+      ->will($this->returnValue($markup));
 
     $block_builder = new BlockBuilder($asset_utility, $entity_manager, $renderer);
 

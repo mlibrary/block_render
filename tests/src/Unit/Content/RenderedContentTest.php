@@ -20,7 +20,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests the construct.
    */
   public function testRenderedContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
       ->getMock();
 
     new RenderedContent(['test' => $content], FALSE);
@@ -51,7 +51,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests adding content.
    */
   public function testAddContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
       ->getMock();
 
     $rendered = new RenderedContent();
@@ -80,7 +80,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests getting the content.
    */
   public function testGetContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
       ->getMock();
 
     $rendered = new RenderedContent(['test' => $content], FALSE);
@@ -108,7 +108,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests if the item is single.
    */
   public function testIsSingle() {
-    $content = $this->getMockBuilder('Drupal\Component\Utility\SafeStringInterface')
+    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
       ->getMock();
 
     $rendered = new RenderedContent(['test' => $content], FALSE);

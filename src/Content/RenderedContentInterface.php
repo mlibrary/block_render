@@ -6,8 +6,6 @@
 
 namespace Drupal\block_render\Content;
 
-use Drupal\Component\Utility\SafeStringInterface;
-
 /**
  * Contains the rendered content.
  */
@@ -17,7 +15,7 @@ interface RenderedContentInterface extends \IteratorAggregate {
    * Gets the content.
    *
    * @return arrat
-   *   Array of Drupal\Component\Utility\SafeStringInterface objects.
+   *   Array of DDrupal\Component\Render\MarkupInterface objects.
    */
   public function getContent();
 
