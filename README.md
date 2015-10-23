@@ -38,7 +38,9 @@ http://example.com/block-render/BLOCK
 Block Render will render the block in the same theme the block was setup for.
 Configuration can be passed into the block as a query string. For instance, if
 the block has a configuration variable "num_posts", I could pass it in like:
+```
 http://example.com/block-render/BLOCK?num_posts=5
+```
 This configuration will be passed to the block before it is rendered. It might
 be best to create an empty theme for delivering blocks via iframe (i.e. all
 the blocks in the theme should be in the "Disabled" region). This prevents
