@@ -96,13 +96,15 @@ class BlockBuilder implements BlockBuilderInterface {
       $this->executePreRender($build);
 
       // Get the attached assets.
-      $attached = array_merge_recursive($attached, $build['content']['#attached']);
-      unset($build['content']['#attached']);
+      if (!empty($build['content']['#attached'])) {
+        $attached = array_merge_recursive($attached, $build['content']['#attached']);
+        unset($build['content']['#attached']);
+      }
 
       // Render the block. Render root is used to prevent the cachable metadata
       // from being added to the response, which throws a fatal error. The build
       // is typecasted as a string, because an object is returned.
-      $content->addContent($block->id(), $this->getRenderer()->renderRoot($build));
+      $content->addContent($block->id(), (string) $this->getRenderer()->renderRoot($build));
     }
 
     // Get all of the Assets.

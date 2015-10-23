@@ -7,6 +7,7 @@
 namespace Drupal\block_render\Plugin\rest\resource;
 
 use Drupal\block\BlockInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -45,6 +46,11 @@ class BlockRenderResource extends BlockRenderResourceBase {
 
     $response = new ResourceResponse($this->getBuilder()->build($block, $loaded));
     $response->addCacheableDependency($block);
+
+    // Cache a different version based on the Query Args.
+    $cache = new CacheableMetadata();
+    $cache->addCacheContexts(['url.query_args']);
+    $response->addCacheableDependency($cache);
 
     return $response;
   }

@@ -7,6 +7,7 @@
 namespace Drupal\block_render\Plugin\rest\resource;
 
 use Drupal\rest\ResourceResponse;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -37,11 +38,18 @@ class BlockRenderMultipleResource extends BlockRenderResourceBase {
     $block_ids = $this->getRequest()->get('blocks', array());
 
     if ($block_ids) {
-      return $this->getMultiple($block_ids);
+      $response = $this->getMultiple($block_ids);
     }
     else {
-      return $this->getList();
+      $response = $this->getList();
     }
+
+    // Cache a different version based on the Query Args.
+    $cache = new CacheableMetadata();
+    $cache->addCacheContexts(['url.query_args']);
+    $response->addCacheableDependency($cache);
+
+    return $response;
   }
 
   /**

@@ -7,6 +7,7 @@
 namespace Drupal\Tests\block_render\Unit\Plugin\rest\resource;
 
 use Drupal\block_render\Plugin\rest\resource\BlockRenderResource;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -24,6 +25,16 @@ class BlockRenderResourceTest extends BlockRenderResourceBase {
    * Test Response to GET requests.
    */
   public function testGet() {
+    $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+    $cache_contexts_manager = new CacheContextsManager($container, [
+      'url.query_args',
+    ]);
+    $container->expects($this->once())
+      ->method('get')
+      ->with('cache_contexts_manager')
+      ->will($this->returnValue($cache_contexts_manager));
+    \Drupal::setContainer($container);
+
     $configuration = array();
     $plugin_id = $this->randomMachineName();
     $plugin_definition = array();

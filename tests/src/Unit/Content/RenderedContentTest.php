@@ -20,21 +20,11 @@ class RenderedContentTest extends UnitTestCase {
    * Tests the construct.
    */
   public function testRenderedContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
-      ->getMock();
+    $content = 'test content';
 
     new RenderedContent(['test' => $content], FALSE);
     new RenderedContent(['test' => $content], TRUE);
     new RenderedContent(['test' => $content, 'test2' => $content], TRUE);
-  }
-
-  /**
-   * Tests a failure of the rendered content object.
-   */
-  public function testRenderedContentFailure() {
-    $this->setExpectedException('\PHPUnit_Framework_Error');
-
-    new RenderedContent(['test' => 'string']);
   }
 
   /**
@@ -51,8 +41,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests adding content.
    */
   public function testAddContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
-      ->getMock();
+    $content = 'test content';
 
     $rendered = new RenderedContent();
 
@@ -67,21 +56,10 @@ class RenderedContentTest extends UnitTestCase {
   }
 
   /**
-   * Tests adding content failure.
-   */
-  public function testAddContentFailure() {
-    $this->setExpectedException('\PHPUnit_Framework_Error');
-
-    $rendered = new RenderedContent();
-    $rendered->addContent('test', 'string');
-  }
-
-  /**
    * Tests getting the content.
    */
   public function testGetContent() {
-    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
-      ->getMock();
+    $content = 'test content';
 
     $rendered = new RenderedContent(['test' => $content], FALSE);
 
@@ -108,8 +86,7 @@ class RenderedContentTest extends UnitTestCase {
    * Tests if the item is single.
    */
   public function testIsSingle() {
-    $content = $this->getMockBuilder('Drupal\Component\Render\MarkupInterface')
-      ->getMock();
+    $content = 'test content';
 
     $rendered = new RenderedContent(['test' => $content], FALSE);
     $this->assertFalse($rendered->isSingle());

@@ -7,7 +7,6 @@
 namespace Drupal\block_render\Content;
 
 use Drupal\block_render\Immutable;
-use Drupal\Component\Render\MarkupInterface;
 
 /**
  * Contains the rendered content.
@@ -50,13 +49,13 @@ final class RenderedContent extends Immutable implements RenderedContentInterfac
    *
    * @param string $id
    *   Identifier of the content.
-   * @param \Drupal\Component\Render\MarkupInterface $markup
+   * @param string $markup
    *   A safe string of the rendered content.
    *
    * @return \Drupal\block_render\Cotnent\RenderedContent
    *   Rendered Content object.
    */
-  public function addContent($id, MarkupInterface $markup) {
+  public function addContent($id, $markup) {
     $this->content[$id] = $markup;
 
     return $this;
