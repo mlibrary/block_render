@@ -32,7 +32,9 @@ purposes of these examples:
 
 ### iFrame
 A block can be accessed on an iframe at:
+```
 http://example.com/block-render/BLOCK
+```
 Block Render will render the block in the same theme the block was setup for.
 Configuration can be passed into the block as a query string. For instance, if
 the block has a configuration variable "num_posts", I could pass it in like:
@@ -48,7 +50,9 @@ rendered server-side or client-side.
 
 #### List
 A list of all renderable blocks can be accessed at:
+```
 http://example.com/block-render?_format=FORMAT
+```
 ```json
 [
   {
@@ -66,7 +70,9 @@ Configuration can be passed to the block in the same way as the iFrame endpoint.
 The block's dependencies (css & javascript) are included in the response as well
 as a list of libraries that are used. Libraries can be excluded from the
 response by using the `loaded` query parameter. As an example:
+```
 http://example.com/block-render/BLOCK?_format=FORMAT&loaded[]=jquery
+```
 and it will be removed from the response.
 ```json
 {
@@ -123,13 +129,17 @@ and it will be removed from the response.
 
 #### Multiple
 Multiple blocks can be requested with the `blocks` query param like so:
+```
 http://example.com/block-render?_format=FORMAT&blocks[]=BLOCK1&blocks[]=BLOCK2
+```
 The dependencies are combined for all blocks that are loaded, so it is best to
 load all blocks on a single request so all of the dependencies can be resolved
 before rendering on the page. To exclude a dependency the `loaded` query param
 can be used just as in the Single response. Configuration can also be passed to
 the blocks, but it is now namespaced like so:
+```
 http://example.com/block-render?_format=FORMAT&blocks[]=BLOCK1&blocks[]=BLOCK2&BLOCK1[num_posts]=5
+```
 The block machine name becomes the variable name and the configuration is an
 associative array of values.
 ```json
