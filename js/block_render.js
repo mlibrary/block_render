@@ -14,7 +14,7 @@ window.Drupal = window.Drupal || {};
 
 (function (JSON) {
 
-  "use strict";
+  'use strict';
 
   /**
    * @namespace
@@ -25,34 +25,37 @@ window.Drupal = window.Drupal || {};
      * Render a Block.
      *
      * @param {string} base_url
+     *   Endpoint URL
      * @param {object} options
+     *   Endpoint Options.
      */
-    render: function(base_url, options) {
+    render: function (base_url, options) {
       var request = new XMLHttpRequest();
 
-      request.onreadystatechange = function() {
-        if (request.readyState != XMLHttpRequest.DONE ) {
+      request.onreadystatechange = function () {
+        if (request.readyState !== XMLHttpRequest.DONE) {
           return;
         }
 
-        if (request.status != 200) {
+        if (request.status !== 200) {
           return;
         }
 
         var data = JSON.parse(request.responseText);
 
         // Insert the 'content' from the request.
+        var insert;
         for (var block_id in options.blocks) {
           if (typeof options.blocks[block_id] == 'object') {
             if (typeof options.blocks[block_id].element == 'object') {
-              var insert = options.blocks[block_id].element
+              insert = options.blocks[block_id].element;
             }
             else {
-              var insert = document.getElementById(options.blocks[block_id].element);
+              insert = document.getElementById(options.blocks[block_id].element);
             }
           }
           else {
-            var insert = document.getElementById(options.blocks[block_id]);
+            insert = document.getElementById(options.blocks[block_id]);
           }
           insert.innerHTML = data.content[block_id];
         }
@@ -77,13 +80,13 @@ window.Drupal = window.Drupal || {};
                   }
                 }
 
-                if (item.tag == 'script' && !element.type) {
+                if (item.tag === 'script' && !element.type) {
                   element.type = 'text/javascript';
                   element.async = false;
                 }
 
                 // Inject the asset onto the page.
-                if (position == 'header') {
+                if (position === 'header') {
                   document.head.appendChild(element);
                 }
                 else {
@@ -95,7 +98,7 @@ window.Drupal = window.Drupal || {};
           }
         }
 
-      }
+      };
 
       // Base URL.
       var url = base_url + '?_format=json';
@@ -103,17 +106,17 @@ window.Drupal = window.Drupal || {};
       // Append all of the requested blocks.
       if (options.blocks) {
         for (var block_id in options.blocks) {
-          if (options.blocks.hasOwnProperty(block_id)){
+          if (options.blocks.hasOwnProperty(block_id)) {
             url = url + '&blocks[]=' + encodeURIComponent(block_id);
 
             // Append the block options.
             for (var option in options.blocks[block_id]) {
-              if (options.blocks[block_id].hasOwnProperty(option)){
-                if (option == 'element') {
+              if (options.blocks[block_id].hasOwnProperty(option)) {
+                if (option === 'element') {
                   continue;
                 }
 
-                url = url + '&' + block_id +'[' + option + ']=' + encodeURIComponent(options.blocks[block_id][option]);
+                url = url + '&' + block_id + '[' + option + ']=' + encodeURIComponent(options.blocks[block_id][option]);
               }
             }
           }
@@ -134,6 +137,6 @@ window.Drupal = window.Drupal || {};
 
     }
 
-  }
+  };
 
 })(window.JSON);
