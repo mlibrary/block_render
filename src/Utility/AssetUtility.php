@@ -90,12 +90,12 @@ class AssetUtility implements AssetUtilityInterface {
     // Get the Librarys.
     $libraries = $this->getLibraryUtility()->getLibraryResponse($assets);
 
-    // Get the performence configuration.
-    $performence = $this->getConfig()->get('system.performance');
+    // Get the performance configuration.
+    $performance = $this->getConfig()->get('system.performance');
 
     // Get the CSS & JS Assets.
-    $css = $this->getAssetResolver()->getCssAssets($assets, $performence->get('css.preprocess'));
-    $js = $this->getAssetResolver()->getJsAssets($assets, $performence->get('js.preprocess'));
+    $css = $this->getAssetResolver()->getCssAssets($assets, $performance->get('css.preprocess'));
+    $js = $this->getAssetResolver()->getJsAssets($assets, $performance->get('js.preprocess'));
 
     $header = $this->getCssRenderer()->render($css) + $this->getJsRenderer()->render($js[0]);
     $header = array_map([$this, 'cleanAssetProperties'], $header);
