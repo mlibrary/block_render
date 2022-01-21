@@ -46,5 +46,5 @@ services:
     class: Drupal\block_render\BlockBuilder
     arguments:
       - '@block_render.utility.asset'
-      - '@entity.manager'
+      - '@entity_type.manager'
       - '@renderer'

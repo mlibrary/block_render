@@ -21,7 +21,7 @@ class BlockBuilderTest extends UnitTestCase {
    * Test building multiple blocks.
    */
   public function testBuildMultiple() {
-    $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+    $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
     $cache_contexts_manager = new CacheContextsManager($container, [
       'url.query_args',
     ]);
@@ -31,8 +31,8 @@ class BlockBuilderTest extends UnitTestCase {
       ->will($this->returnValue($cache_contexts_manager));
     \Drupal::setContainer($container);
 
-    $asset_response = $this->getMock('Drupal\block_render\Response\AssetResponseInterface');
-    $asset_utility = $this->getMock('Drupal\block_render\Utility\AssetUtilityInterface');
+    $asset_response = $this->createMock('Drupal\block_render\Response\AssetResponseInterface');
+    $asset_utility = $this->createMock('Drupal\block_render\Utility\AssetUtilityInterface');
     $asset_utility->expects($this->once())
       ->method('getAssetResponse')
       ->will($this->returnValue($asset_response));
@@ -40,7 +40,7 @@ class BlockBuilderTest extends UnitTestCase {
     $machine_name = $this->randomMachineName();
     $block = $this->getBlockMockWithMachineName($machine_name);
 
-    $entity_builder = $this->getMock('Drupal\Core\Entity\EntityViewBuilderInterface');
+    $entity_builder = $this->createMock('Drupal\Core\Entity\EntityViewBuilderInterface');
     $entity_builder->expects($this->once())
       ->method('view')
       ->with($block)
@@ -51,14 +51,14 @@ class BlockBuilderTest extends UnitTestCase {
           ],
         ]));
 
-    $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
+    $entity_manager = $this->createMock('Drupal\Core\Entity\EntityManagerInterface');
     $entity_manager->expects($this->once())
       ->method('getViewBuilder')
       ->with('block')
       ->will($this->returnValue($entity_builder));
 
-    $markup = $this->getMock('Drupal\Component\Render\MarkupInterface');
-    $renderer = $this->getMock('Drupal\Core\Render\RendererInterface');
+    $markup = $this->createMock('Drupal\Component\Render\MarkupInterface');
+    $renderer = $this->createMock('Drupal\Core\Render\RendererInterface');
     $renderer->expects($this->once())
       ->method('renderRoot')
       ->will($this->returnValue($markup));

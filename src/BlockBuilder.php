@@ -12,7 +12,7 @@ use Drupal\block_render\Utility\AssetUtilityInterface;
 use Drupal\block_render\Response\BlockResponse;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 
 /**
@@ -30,14 +30,14 @@ class BlockBuilder implements BlockBuilderInterface {
   /**
    * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityManager;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterfac
+   * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
 
@@ -49,7 +49,7 @@ class BlockBuilder implements BlockBuilderInterface {
    */
   public function __construct(
     AssetUtilityInterface $asset_utility,
-    EntityManagerInterface $entity_manager,
+    EntityTypeManagerInterface $entity_manager,
     RendererInterface $renderer) {
 
     $this->assetUtility = $asset_utility;

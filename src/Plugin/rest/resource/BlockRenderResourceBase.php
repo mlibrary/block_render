@@ -8,7 +8,7 @@ namespace Drupal\block_render\Plugin\rest\resource;
 
 use Drupal\block\BlockInterface;
 use Drupal\block_render\BlockBuilderInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\rest\Plugin\ResourceBase;
@@ -32,7 +32,7 @@ abstract class BlockRenderResourceBase extends ResourceBase {
   /**
    * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityManager;
 
@@ -65,7 +65,7 @@ abstract class BlockRenderResourceBase extends ResourceBase {
     array $serializer_formats,
     LoggerInterface $logger,
     AccountInterface $current_user,
-    EntityManagerInterface $entity_manager,
+    EntityTypeManagerInterface $entity_manager,
     BlockBuilderInterface $builder,
     TranslationInterface $translator,
     RequestStack $request) {
@@ -89,7 +89,7 @@ abstract class BlockRenderResourceBase extends ResourceBase {
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
       $container->get('current_user'),
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('block_render.block_builder'),
       $container->get('string_translation'),
       $container->get('request_stack')

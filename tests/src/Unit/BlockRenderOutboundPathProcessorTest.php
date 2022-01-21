@@ -22,7 +22,7 @@ class BlockRenderOutboundPathProcessorTest extends UnitTestCase {
    * @dataProvider routes
    */
   public function testProcessOutbound($route_name, $absolute) {
-    $route = $this->getMock('Drupal\Core\Routing\RouteMatchInterface');
+    $route = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
     $route->expects($this->once())
       ->method('getRouteName')
       ->will($this->returnValue($route_name));

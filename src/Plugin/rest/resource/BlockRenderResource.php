@@ -65,6 +65,7 @@ class BlockRenderResource extends BlockRenderResourceBase {
 
     foreach ($this->getFormats() as $format) {
       $route = $collection->get($this->getPluginId() . '.GET.' . $format);
+if (!$route) { return; }
       $options = $route->getOptions();
       $options['parameters']['block']['type'] = 'entity:block';
       $route->setOptions($options);

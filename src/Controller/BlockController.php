@@ -9,7 +9,7 @@ namespace Drupal\block_render\Controller;
 use Drupal\block\BlockInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,7 +24,7 @@ class BlockController extends ControllerBase {
   /**
    * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityManager;
 
@@ -53,7 +53,7 @@ class BlockController extends ControllerBase {
    * Constructor to add the dependencies.
    */
   public function __construct(
-    EntityManagerInterface $entity_manager,
+    EntityTypeManagerInterface $entity_manager,
     RequestStack $request,
     AccountInterface $current_user,
     TranslationInterface $string_translation) {
@@ -69,7 +69,7 @@ class BlockController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('request_stack'),
       $container->get('current_user'),
       $container->get('string_translation')
@@ -95,7 +95,7 @@ class BlockController extends ControllerBase {
     $block->getPlugin()->setConfiguration($config);
 
     // Build the block.
-    $build = $this->entityManager()->getViewBuilder('block')->view($block);
+    $build = \Drupal::service('entity_type.manager')->getViewBuilder('block')->view($block);
 
     // If a lazy_builder is returned, execute that first.
     if (isset($build['#lazy_builder'])) {
